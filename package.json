@@ -1,0 +1,33 @@
+{
+  "name": "react-native-stylesheet-adapt",
+  "version": "1.0.0",
+  "description": "StyleSheet样式表创建，适配各种机型、各种屏幕 与StyleSheet用法一致",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gegeyang0124/react-native-stylesheet-adapt.git"
+  },
+  "keywords": [
+    "react-native-stylesheet-adapt",
+    "react-native-stylesheet",
+    "stylesheet",
+    "adapt",
+    "样式",
+    "适配",
+    "机型"
+  ],
+  "author": {
+    "name": "周阳",
+    "email": "584450903@qq.com",
+    "url": "https://github.com/gegeyang0124",
+    "blog":"http://blog.sina.com.cn/s/articlelist_6078695441_0_1.html"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gegeyang0124/react-native-stylesheet-adapt/issues"
+  },
+  "homepage": "https://github.com/gegeyang0124/react-native-stylesheet-adapt#readme"
+}
