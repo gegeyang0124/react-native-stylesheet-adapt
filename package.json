@@ -1,6 +1,6 @@
 {
   "name": "react-native-stylesheet-adapt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "StyleSheet样式表创建，适配各种机型、各种屏幕 与StyleSheet用法一致",
   "main": "index.js",
   "scripts": {
