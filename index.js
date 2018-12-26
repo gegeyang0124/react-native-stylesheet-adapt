@@ -3,18 +3,6 @@ import {
     StyleSheet,
 } from 'react-native';
 
-const screenGet = Dimensions.get('window');
-
-const screen = {
-    width:screenGet.width > screenGet.height ? screenGet.height : screenGet.width,
-    height:screenGet.width > screenGet.height ? screenGet.width : screenGet.height,
-    fontScale:screenGet.fontScale,
-    scale:screenGet.scale
-};
-
-//let {width,height,scale} = Dimensions.get('window');
-const designSize = {width:768,height:1024};//页面设计大小
-
 /**
  * 横向需要转化的样式属性数组
  * **/
@@ -23,6 +11,7 @@ const styleConvertArrWidth = [
     "borderBottomRightRadius","borderTopRightRadius", "padding","paddingLeft",
     "paddingRight", "marginLeft","marginRight", "left","right","fontSize"
 ];
+
 /**
  * 纵向需要转化的样式属性数组
  * **/
@@ -40,14 +29,7 @@ export default class StyleSheetAdapt{
     /**
      * 页面设计大小 {width:768,height:1024};//页面设计大小
      * **/
-    static designSize = null;//designSize = {width:768,height:1024};//页面设计大小
-
-    static firstExe = true;
-
-    /**
-     * 返回 StyleSheet 对象
-     * **/
-    static styleSheet : StyleSheet;
+    static designSize = {width:768,height:1024};//designSize = {width:768,height:1024};//页面设计大小
 
     /**
      * 转化后的style json 对象
@@ -57,7 +39,7 @@ export default class StyleSheetAdapt{
     /**
      * 屏幕长宽分辨率json
      * **/
-    static screen = screen;
+    static screen = Dimensions.get('window');;
 
     /**
      * 屏幕与设计适配比率
@@ -65,149 +47,84 @@ export default class StyleSheetAdapt{
      * heightScale 高度比率
      * **/
     static scale = {
-        widthScale: screen.width / designSize.width,
-        heightScale: screen.height / designSize.height,
-    };
-
-    /**
-     * 屏幕与设计适配比率 随屏幕变化
-     * widthScale 宽度比率
-     * heightScale 高度比率
-     * **/
-    static scaleS = {
-        widthScale: screenGet.width / designSize.width,
-        heightScale: screenGet.height / designSize.height,
+        widthScale: 1,
+        heightScale: 1,
     };
 
     /**
      * 获取适配比例
      * **/
     static getScale(){
-        if(StyleSheetAdapt.designSize && StyleSheetAdapt.firstExe){
-            let designSize2 = StyleSheetAdapt.designSize;
-            StyleSheetAdapt.scale ={
-                widthScale: screen.width / designSize2.width,
-                heightScale: screen.height / designSize2.height,
-            };
-            StyleSheetAdapt.scaleS = {
-                widthScale: screenGet.width / designSize2.width,
-                heightScale: screenGet.height / designSize2.height,
-            };
+        this.screen = Dimensions.get('window');
+        this.designSize = this.screen.width > this.screen.height
+            ? {
+                width:this.designSize.height,
+                height:this.designSize.width
+            }
+            : this.designSize;
 
-            StyleSheetAdapt.firstExe = false;
-        }
+        this.scale = {
+            widthScale: this.screen.width / this.designSize.width,
+            heightScale: this.screen.height / this.designSize.height,
+        };
     }
 
     /**
      * 获取横向的与屏幕的相对长度  数字后面可加以下字符
      * @prama width ;//横向宽度值,特殊值是'w'取屏幕宽, 不传也取屏幕宽 若加字符，加数字后面
-     * //'s':随屏幕调整布局 取屏幕宽(主要适用于横竖屏切换)
      * //'dw' 获取相对当前屏幕的设计宽比的宽
      * //'w' 获取相对当前屏幕宽的宽
      * //'n' 不进行屏幕比缩放
      * //'dh' 获取相对当前屏幕的设计高比的宽
      * //'h' 获取相对当前屏幕高比的宽
-     * 以上字符后面加's'后会随屏幕调整布局
      * **/
     static getWidth(width){
-
-        StyleSheetAdapt.getScale();
+        this.getScale();
 
         if(width == undefined)
         {
             width = this.screen.width;
         }
-        else if(width == 's'){
-            width = screenGet.width;
-        }
         else
         {
             if(typeof (width) == 'string')
             {
-                //'s':随屏幕调整布局
-                if(width.indexOf('s') > -1){
-                    width = width.replace('s', '');
-                    let p = /[a-zA-Z]/i;
-                    let b = p.test(width);//true,说明有英文字母
-                    if(b){
-                        if(width.indexOf('dw') > -1)//'dw' 获取相对当前屏幕的设计宽比的宽
-                        {
-                            width = width.replace('dw', '');
-                            width = width == '' ? screenGet.width : width;
-                            width = parseFloat(width);
+                if(width.indexOf('dw') > -1)//获取相对当前屏幕的设计宽比的宽
+                {
+                    width = width.replace('dw', '');
+                    width = width == '' ? this.screen.width : width;
+                    width = parseFloat(width);
 
-                            width =  this.scaleS.widthScale * width;
-                        }
-                        else if(width.indexOf('w') > -1)//'w' 获取相对当前屏幕宽的宽
-                        {
-                            width = width.replace('w', '');
-                            width = width == '' ? 1 : width;
-                            width = parseFloat(width);
-                            width = width * screenGet.width;
-                        }
-                        else if(width.indexOf('n') > -1)//'n' 不进行屏幕比缩放
-                        {
-                            width.replace('n', '');
-                            width = parseFloat(width);
-                        }
-                        else  if(width.indexOf('dh') > -1)//'dh' 获取相对当前屏幕的设计高比的宽
-                        {
-                            width = width.replace('dh', '');
-                            width = width == '' ? screenGet.height : width;
-                            width = parseFloat(width);
-
-                            width =  this.scaleS.heightScale * width;
-                        }
-                        else  if(width.indexOf('h') > -1)//'h' 获取相对当前屏幕高比的宽
-                        {
-                            width = width.replace('h', '');
-                            width = width == '' ? 1 : width;
-                            width = parseFloat(width);
-                            width = width * screenGet.height;
-                        }
-                    }
-                    else {
-                        width = parseFloat(width);
-                        width =  this.scaleS.widthScale * width;
-                    }
+                    width =  this.scale.widthScale * width;
                 }
-                else {
+                else if(width.indexOf('w') > -1)//获取相对当前屏幕宽的宽
+                {
+                    width = width.replace('w', '');
+                    width = width == '' ? 1 : width;
+                    width = parseFloat(width);
 
-                    if(width.indexOf('dw') > -1)//获取相对当前屏幕的设计宽比的宽
-                    {
-                        width = width.replace('dw', '');
-                        width = width == '' ? screen.width : width;
-                        width = parseFloat(width);
+                    width = width * this.screen.width;
+                }
+                else if(width.indexOf('n') > -1)//不进行屏幕比缩放
+                {
+                    width.replace('n', '');
+                    width = parseFloat(width);
+                }
+                else  if(width.indexOf('dh') > -1)//获取相对当前屏幕的设计高比的宽
+                {
+                    width = width.replace('dh', '');
+                    width = width == '' ? this.screen.height : width;
+                    width = parseFloat(width);
 
-                        width =  this.scale.widthScale * width;
-                    }
-                    else if(width.indexOf('w') > -1)//获取相对当前屏幕宽的宽
-                    {
-                        width = width.replace('w', '');
-                        width = width == '' ? 1 : width;
-                        width = parseFloat(width);
-                        width = width * screen.width;
-                    }
-                    else if(width.indexOf('n') > -1)//不进行屏幕比缩放
-                    {
-                        width.replace('n', '');
-                        width = parseFloat(width);
-                    }
-                    else  if(width.indexOf('dh') > -1)//获取相对当前屏幕的设计高比的宽
-                    {
-                        width = width.replace('dh', '');
-                        width = width == '' ? screen.height : width;
-                        width = parseFloat(width);
+                    width =  this.scale.heightScale * width;
+                }
+                else  if(width.indexOf('h') > -1)//获取相对当前屏幕高比的宽
+                {
+                    width = width.replace('h', '');
+                    width = width == '' ? 1 : width;
+                    width = parseFloat(width);
 
-                        width =  this.scale.heightScale * width;
-                    }
-                    else  if(width.indexOf('h') > -1)//获取相对当前屏幕高比的宽
-                    {
-                        width = width.replace('h', '');
-                        width = width == '' ? 1 : width;
-                        width = parseFloat(width);
-                        width = width * screen.height;
-                    }
+                    width = width * this.screen.height;
                 }
 
             }
@@ -224,114 +141,58 @@ export default class StyleSheetAdapt{
     /**
      * 获取纵向的与屏幕的相对高度 数字后面可加以下字符
      * @prama height ;//纵向高度值, 特殊值是'h'取屏幕高；不传也取屏幕高,若加字符，加数字后面
-     * //'s':随屏幕调整布局 取屏幕高或宽(主要适用于横竖屏切换)
      * //'dw' 获取相对当前屏幕的设计宽比的宽
      * //'w' 获取相对当前屏幕宽的宽
      * //'n' 不进行屏幕比缩放
      * //'dh' 获取相对当前屏幕的设计高比的宽
      * //'h' 获取相对当前屏幕高比的宽
-     * 以上字符后面加's'后会随屏幕调整布局
      * **/
     static getHeight(height){
-
-        StyleSheetAdapt.getScale();
+        this.getScale();
 
         if(height == undefined)
         {
             height = this.screen.height;
-        }
-        else if(height == 's'){
-            height = screenGet.height;
         }
         else
         {
 
             if(typeof (height) == 'string'){
 
-                //'s':随屏幕调整布局
-                if(height.indexOf('s') > -1){
-                    height = height.replace('s', '');
-                    let p = /[a-zA-Z]/i;
-                    let b = p.test(height);//true,说明有英文字母
-                    if(b){
-                        if(height.indexOf('dh') > -1)//获取相对当前屏幕的设计高比的高
-                        {
-                            height = height.replace('dh', '');
-                            height = height == '' ? screenGet.height : height;
-                            height = parseFloat(height);
+                if(height.indexOf('dh') > -1)//获取相对当前屏幕的设计高比的高
+                {
+                    height = height.replace('dh', '');
+                    height = height == '' ? this.screen.height : height;
+                    height = parseFloat(height);
 
-                            height =  this.scaleS.heightScale * height;
-                        }
-                        else if(height.indexOf('h') > -1)//获取相对当前屏幕高的高
-                        {
-                            height = height.replace('h', '');
-                            height = height == '' ? 1 : height;
-                            height = parseFloat(height);
-                            height = height * screenGet.height;
-                        }
-                        else if(height.indexOf('n') > -1)//不进行屏幕比缩放
-                        {
-                            height.replace('n', '');
-                            height = parseFloat(height);
-                        }
-                        else  if(height.indexOf('dw') > -1)//获取相对当前屏幕的设计宽比的高
-                        {
-                            height = height.replace('dw', '');
-                            height = height == '' ? screenGet.width : height;
-                            height = parseFloat(height);
-
-                            height =  this.scaleS.widthScale * height;
-                        }
-                        else  if(height.indexOf('w') > -1)//获取相对当前屏幕宽比的高
-                        {
-
-                            height = height.replace('w', '');
-                            height = height == '' ? 1 : height;
-                            height = parseFloat(height);
-                            height = height * screenGet.width;
-                        }
-                    }
-                    else {
-                        height = parseFloat(height);
-                        height =  this.scaleS.heightScale * height;
-                    }
+                    height =  this.scale.heightScale * height;
                 }
-                else {
-                    if(height.indexOf('dh') > -1)//获取相对当前屏幕的设计高比的高
-                    {
-                        height = height.replace('dh', '');
-                        height = height == '' ? screen.height : height;
-                        height = parseFloat(height);
+                else if(height.indexOf('h') > -1)//获取相对当前屏幕高的高
+                {
+                    height = height.replace('h', '');
+                    height = height == '' ? 1 : height;
+                    height = parseFloat(height);
+                    height = height * this.screen.height;
+                }
+                else if(height.indexOf('n') > -1)//不进行屏幕比缩放
+                {
+                    height.replace('n', '');
+                    height = parseFloat(height);
+                }
+                else  if(height.indexOf('dw') > -1)//获取相对当前屏幕的设计宽比的高
+                {
+                    height = height.replace('dw', '');
+                    height = height == '' ? this.screen.width : height;
+                    height = parseFloat(height);
 
-                        height =  this.scale.heightScale * height;
-                    }
-                    else if(height.indexOf('h') > -1)//获取相对当前屏幕高的高
-                    {
-                        height = height.replace('h', '');
-                        height = height == '' ? 1 : height;
-                        height = parseFloat(height);
-                        height = height * screen.height;
-                    }
-                    else if(height.indexOf('n') > -1)//不进行屏幕比缩放
-                    {
-                        height.replace('n', '');
-                        height = parseFloat(height);
-                    }
-                    else  if(height.indexOf('dw') > -1)//获取相对当前屏幕的设计宽比的高
-                    {
-                        height = height.replace('dw', '');
-                        height = height == '' ? screen.width : height;
-                        height = parseFloat(height);
-
-                        height =  this.scale.widthScale * height;
-                    }
-                    else  if(height.indexOf('w') > -1)//获取相对当前屏幕宽比的高
-                    {
-                        height = height.replace('w', '');
-                        height = height == '' ? 1 : height;
-                        height = parseFloat(height);
-                        height = height * screen.width;
-                    }
+                    height =  this.scale.widthScale * height;
+                }
+                else  if(height.indexOf('w') > -1)//获取相对当前屏幕宽比的高
+                {
+                    height = height.replace('w', '');
+                    height = height == '' ? 1 : height;
+                    height = parseFloat(height);
+                    height = height * this.screen.width;
                 }
 
             }
