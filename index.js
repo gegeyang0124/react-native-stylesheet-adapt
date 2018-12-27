@@ -39,7 +39,7 @@ export default class StyleSheetAdapt{
     /**
      * 屏幕长宽分辨率json
      * **/
-    static screen = Dimensions.get('window');;
+    static screen = Dimensions.get('window');
 
     /**
      * 屏幕与设计适配比率
