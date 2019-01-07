@@ -40,7 +40,7 @@ import StyleSheetAdapt from "react-native-stylesheet-adapt";
 import React, {Component} from 'react';
 import {View} from 'react-native';
 
-StyleSheetAdapt.designSize = {width:768,height:1024};// 设置页面设计大小 可不设置 默认设计大小12寸平板电脑（{width:768,height:1024}）
+StyleSheetAdapt.designSize = {width:768,height:1024};// 设置页面设计大小（只需设置一次） 可不设置 默认设计大小12寸平板电脑（{width:768,height:1024}）
 const styles = StyleSheetAdapt.create({
     testStyle2:{
         width:100,
